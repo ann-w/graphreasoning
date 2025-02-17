@@ -1,0 +1,10 @@
+# conda install pytorch torchvision torchaudio -c pytorch 
+pytorch
+torchvision
+torchaudio 
+git+https://github.com/lamm-mit/GraphReasoning
+langchain-community==0.3.17
+llama-index-embeddings-huggingface==0.5.1
+llama-cpp-python==0.3.7
+openai==1.63.0
+ratelimit==2.2.1

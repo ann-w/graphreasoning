@@ -9,6 +9,7 @@ from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 
 from GraphReasoning.graph_generation import (
     make_graph_from_text,
+    df2Graph_parallel,
     documents2Dataframe,
     df2Graph,
     graph2Df,
@@ -89,10 +90,14 @@ def generate_graph_from_papers(directory: str,
     #   include_contextual_proximity=True to add extra edges (if desired),
     #   graph_root as the saved file prefix,
     #   chunk_size, chunk_overlap and other parameters as needed.
+
+    # Default params:                           
+    # chunk_size=2500,chunk_overlap=0,
+
     html, graphml, graph, net, pdf = make_graph_from_text(
         all_text,
         generate,
-        include_contextual_proximity=True,
+        include_contextual_proximity=True,  # investigate
         graph_root='knowledge_graph',
         chunk_size=2500,
         chunk_overlap=0,

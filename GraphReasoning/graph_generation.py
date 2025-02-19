@@ -105,6 +105,60 @@ import seaborn as sns  # For more attractive plotting
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
+
+
+
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import numpy as np
+import pandas as pd
+
+
+def df2Graph_parallel(dataframe: pd.DataFrame, generate, repeat_refine=0, verbatim=False) -> list:
+    """
+    Process rows of the dataframe in parallel. Every 10 generated triplet lists,
+    save a checkpoint to a file (triplets_checkpoint_<n>.json).
+    """
+    results = []
+    checkpoint_interval = 10
+
+    checkpoint_dir = Path("./knowledge_graph_paper_examples/checkpoints")
+    checkpoint_dir.mkdir(exist_ok=True, parents=True)
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        # Submit a job for each document row
+        future_to_index = {
+            executor.submit(
+                graphPrompt,
+                row.text,
+                generate,
+                {"chunk_id": row.chunk_id},
+                repeat_refine,
+                verbatim
+            ): i for i, row in dataframe.iterrows()
+        }
+        count = 0
+        for future in as_completed(future_to_index):
+            idx = future_to_index[future]
+            try:
+                res = future.result()
+                if res is not None:
+                    results.append(res)
+            except Exception as exc:
+                print(f'Row {idx} generated an exception: {exc}')
+            count += 1
+            # Save every 10 completions
+            if count % checkpoint_interval == 0:
+                checkpoint_filename = f"triplets_checkpoint_{count}.json"
+                with open(checkpoint_filename, "w") as f:
+                    json.dump(results, f, indent=2)
+                print(f"Checkpoint saved to {checkpoint_filename}")
+    # Remove any None results, flatten list to a single list of triplets
+    results = pd.Series(results).dropna().reset_index(drop=True)
+    combined = np.concatenate(results).ravel().tolist()
+    return combined
+
+
 # Code based on: https://github.com/rahulnyk/knowledge_graph
 
 def extract (string, start='[', end=']'):
@@ -372,7 +426,8 @@ def make_graph_from_text (txt,generate,
     regenerate = True
     
     if regenerate:
-        concepts_list = df2Graph(df,generate,repeat_refine=repeat_refine,verbatim=verbatim) #model='zephyr:latest' )
+        concepts_list = df2Graph_parallel(df,generate,repeat_refine=repeat_refine,verbatim=verbatim) # changed this for parallel processing
+        # concepts_list = df2Graph(df,generate,repeat_refine=repeat_refine,verbatim=verbatim) #model='zephyr:latest' )
         dfg1 = graph2Df(concepts_list)
         if not os.path.exists(outputdirectory):
             os.makedirs(outputdirectory)

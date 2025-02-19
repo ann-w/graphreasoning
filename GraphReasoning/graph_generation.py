@@ -114,7 +114,7 @@ import numpy as np
 import pandas as pd
 
 
-def df2Graph_parallel(dataframe: pd.DataFrame, generate, repeat_refine=0, verbatim=False) -> list:
+def df2Graph_parallel(dataframe: pd.DataFrame, generate, repeat_refine=0, verbatim=False, output_folder='knowledge_graph_paper_examples') -> list:
     """
     Process rows of the dataframe in parallel. Every 10 generated triplet lists,
     save a checkpoint to a file (triplets_checkpoint_<n>.json).
@@ -122,7 +122,7 @@ def df2Graph_parallel(dataframe: pd.DataFrame, generate, repeat_refine=0, verbat
     results = []
     checkpoint_interval = 10
 
-    checkpoint_dir = Path("./knowledge_graph_paper_examples/checkpoints")
+    checkpoint_dir = Path(f"./{output_folder}/checkpoints")
     checkpoint_dir.mkdir(exist_ok=True, parents=True)
 
     with ThreadPoolExecutor(max_workers=5) as executor:

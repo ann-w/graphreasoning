@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+export CMAKE_ARGS="-DGGML_CUDA=on"
+pip install "llama-cpp-python<=2.79.0" --no-cache-dir --verbose

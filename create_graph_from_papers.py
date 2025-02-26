@@ -57,7 +57,7 @@ def combine_documents_text(documents: List[Any]) -> str:
 def generate_graph_from_papers(
     directory: str,
     generate: Callable[[str, str], str],
-    data_dir: str = "./knowledge_graph_paper_examples/",
+    output_dir: str = "./knowledge_graph_paper_examples/",
     num_docs: Optional[int] = None,
 ) -> nx.Graph:
     """
@@ -71,7 +71,7 @@ def generate_graph_from_papers(
     Args:
         directory (str): Directory containing PDF documents.
         generate (Callable[[str, str], str]): Function to call the LLM.
-        data_dir (str): Directory to save intermediate files and final graph.
+        output_dir (str): Directory to save intermediate files and final graph.
         num_docs (Optional[int]): Number of documents to load.
 
     Returns:
@@ -99,7 +99,7 @@ def generate_graph_from_papers(
         chunk_overlap=0,
         repeat_refine=0,
         verbatim=False,
-        data_dir=data_dir,
+        data_dir=output_dir,
         save_PDF=False,
         save_HTML=True,
     )
@@ -121,7 +121,7 @@ def main():
     args = parser.parse_args()
 
     directory = "./paper_examples/"
-    data_dir = "./knowledge_graph_paper_examples/"
+    output_dir = "./knowledge_graph_paper_examples/"
 
     azure_openai_client = AzureOpenAIClient()
 
@@ -138,9 +138,9 @@ def main():
         return azure_openai_client.generate_response(messages)
 
     G = generate_graph_from_papers(
-        directory, generate, data_dir=data_dir, num_docs=args.num_docs
+        directory, generate, output_dir=output_dir, num_docs=args.num_docs
     )
-    print(f"Graph generated and saved to {data_dir}")
+    print(f"Graph generated and saved to {output_dir}")
 
 
 if __name__ == "__main__":

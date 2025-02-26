@@ -65,6 +65,12 @@ We will use Azure OpenAI to create this graph.
     python create_graph_from_papers.py
     ```
 
+    or if you'd like to save the logs to a textfile, you can run:
+    ```
+    chmod +x ./run_create_graph_from_papers.sh
+    ./run_create_graph_from_papers.sh
+    ```
+
 ## Reasoning over the knowledge graph
 
 If you'd like to try out reasoning over a knowledge graph, you can run this notebook: `GraphReasoning/libs/GraphReasoning/Notebooks/GraphReasoning - Graph Reasoning with LLM - BioMixtral.ipynb`

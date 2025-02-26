@@ -2,11 +2,11 @@
 
 *__pycache__/
 *_*.json
-graph_output.txt
+graph_output*.txt
 GRAPHDATA
 GRAPHDATA_OUTPUT
 *graph.svg
-*knowledge_graph_paper_examples
+*knowledge_graph_paper_examples*
 
 # Distribution / packaging
 .Python

@@ -149,7 +149,7 @@ def df2Graph_parallel(dataframe: pd.DataFrame, generate, repeat_refine=0, verbat
             count += 1
             # Save every 10 completions
             if count % checkpoint_interval == 0:
-                checkpoint_filename = f"triplets_checkpoint_{count}.json"
+                checkpoint_filename = f"{output_folder}/triplets_checkpoint_{count}.json"
                 with open(checkpoint_filename, "w") as f:
                     json.dump(results, f, indent=2)
                 print(f"Checkpoint saved to {checkpoint_filename}")
@@ -426,7 +426,7 @@ def make_graph_from_text (txt,generate,
     regenerate = True
     
     if regenerate:
-        concepts_list = df2Graph_parallel(df,generate,repeat_refine=repeat_refine,verbatim=verbatim) # changed this for parallel processing
+        concepts_list = df2Graph_parallel(df,generate,repeat_refine=repeat_refine,verbatim=verbatim, output_folder=data_dir) # changed this for parallel processing
         # concepts_list = df2Graph(df,generate,repeat_refine=repeat_refine,verbatim=verbatim) #model='zephyr:latest' )
         dfg1 = graph2Df(concepts_list)
         if not os.path.exists(outputdirectory):

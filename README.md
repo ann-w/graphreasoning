@@ -1,6 +1,6 @@
 # GraphReasoning
 
-This repository contains the graphreasoning library and scripts to create a knowledge graph.
+This repository contains the graphreasoning library and scripts to create a knowledge graph and is forked from [here](https://github.com/lamm-mit/GraphReasoning). 
 
 ## Create conda environment
 

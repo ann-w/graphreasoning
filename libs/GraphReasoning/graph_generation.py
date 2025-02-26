@@ -149,7 +149,7 @@ def df2Graph_parallel(dataframe: pd.DataFrame, generate, repeat_refine=0, verbat
             count += 1
             # Save every 10 completions
             if count % checkpoint_interval == 0:
-                checkpoint_filename = f"{output_folder}/triplets_checkpoint_{count}.json"
+                checkpoint_filename = f"{checkpoint_dir}/triplets_checkpoint_{count}.json"
                 with open(checkpoint_filename, "w") as f:
                     json.dump(results, f, indent=2)
                 print(f"Checkpoint saved to {checkpoint_filename}")

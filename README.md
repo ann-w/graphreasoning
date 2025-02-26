@@ -2,6 +2,11 @@
 
 This repository contains the graphreasoning library and scripts to create a knowledge graph and is forked from [here](https://github.com/lamm-mit/GraphReasoning). 
 
+Changes made:
+- Add parallel API calls to speed up extraction of nodes and relationships
+- Fix package versions
+- Create script to create knowledge graph given a directory with pdf files
+
 ## Create conda environment
 
 1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution) if you haven't already.

@@ -7,7 +7,7 @@ Changes made:
 - Fix package versions
 - Create script to create knowledge graph given a directory with pdf files
 
-## Create conda environment
+## Setup
 
 1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution) if you haven't already.
 
@@ -41,11 +41,7 @@ CMAKE_ARGS="-DLLAVA_BUILD=OFF" pip install -U llama-cpp-python
     python3 -m ipykernel install --user --name graphreasoning --display-name "Python3 (graphreasoning)"
     ```
 
-
-
-
-
-## Creating a knowledge graph
+## Step 1: Creating a knowledge graph
 
 The folder `paper_examples` contains a set of sample papers from which we can create a graph. 
 We will use Azure OpenAI to create this graph.
@@ -71,30 +67,45 @@ We will use Azure OpenAI to create this graph.
     ./run_create_graph_from_papers.sh
     ```
 
-## Reasoning over the knowledge graph
+## Step 2: Embed the nodes of the knowledge graph
 
-If you'd like to try out reasoning over a knowledge graph, you can run this notebook: `GraphReasoning/libs/GraphReasoning/Notebooks/GraphReasoning - Graph Reasoning with LLM - BioMixtral.ipynb`
+1. ill in the following values in the `.env` file.
 
-<!-- 
-## Setup AML Resources
+    ```
+    AZURE_OPENAI_EMBEDDING_API_KEY="<your-azure-openai-embedding-api-key>"
+    AZURE_OPENAI_EMBEDDING_API_VERSION="<your-azure-openai-embedding-api-version>"
+    AZURE_OPENAI_EMBEDDING_ENDPOINT="<your-azure-openai-embedding-endpoint>"
+    AZURE_OPENAI_EMBEDDING_MODEL_NAME="<your-azure-openai-embedding-model-name>"
+    ```
 
-You need the following resources in Azure:
+2. To embed the nodes of the knowledge graph, run:
 
-- Azure Machine Learning -->
-
-<!-- 
-- Setup environment with terraform
-had to enable storage access from all networks to create an environment
-- cpu-cluster: Standard_D13_v2 (8 cores, 56 GB RAM, 400 GB disk) -> todo: change this in the terraform? 
-- roles to assign to Storage Account. Copy principal and assign blob storage data reader and blob storage data owner and 
-Storage Blob Data Contributor, 
-- storage account > networking > allow from selected networks
-- AML > networking > allow from selected networks -->
-
-<!-- ### Create AML Environment 
-
-- Go to `environment_setup_aml` folder
-- Run in terminal:
     ```bash
-    python create_env.py
-    ``` -->
+    python create_embeddings_from_knowledge_graph.py
+    ```
+
+## Step 3: Reason over the knowledge graph
+
+GraphReasoning allows you to discover connections between concepts and generate insights using a large language model (LLM).
+
+It requires: 
+- Two keywords (e.g., "cement" and "environment") that represent the concepts you want to connect
+- A knowledge graph (G) containing nodes and relationships
+- Node embeddings that represent the semantic meaning of each node
+- An LLM generate function for reasoning over the paths
+
+It works as follows:
+
+1. **Node Matching**: It first finds the best-fitting nodes in the graph that match your keywords by calculating semantic similarity between your keywords and the node embeddings.
+
+2. **Path Identification**: Once the corresponding nodes are identified, the function finds the shortest path between these nodes in the knowledge graph.
+
+3. **Subgraph Extraction**: It extracts a subgraph containing the path and related relationships, which provides the context for reasoning.
+
+Example usage:
+
+To reason with the keywords 'cement' and 'environment', run:
+
+```bash
+python reason_with_knowledge_graph.py --keyword1 "cement" --keyword2 "environment"
+```

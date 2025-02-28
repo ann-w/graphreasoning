@@ -18,6 +18,6 @@ def inspect_embeddings(embeddings):
 
 
 if __name__ == "__main__":
-    embeddings_path = "./knowledge_graph_paper_examples/embeddings/node_embeddings.pkl"
+    embeddings_path = "./data/output/embeddings/node_embeddings.pkl"
     embeddings = load_embeddings(embeddings_path)
     inspect_embeddings(embeddings)

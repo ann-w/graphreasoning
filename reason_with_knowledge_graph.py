@@ -45,10 +45,10 @@ def create_generate_function(client, temperature_value):
 def query_graph_with_openai(
     keyword_1="cement",
     keyword_2="health",
-    graph_path="knowledge_graph_paper_examples/knowledge_graph_graphML.graphml",
-    embeddings_path="knowledge_graph_paper_examples/embeddings/node_embeddings.pkl",
+    graph_path="data/output/graphs/knowledge_graph_graphML.graphml",
+    embeddings_path="data/output/embeddings/node_embeddings.pkl",
     temperature=0.3,
-    output_dir="knowledge_graph_paper_examples/qa_pairs",
+    output_dir="data/output/qa_pairs",
     save_output_csv=True,
 ):
     """Query the graph and generate a response using Azure OpenAI."""

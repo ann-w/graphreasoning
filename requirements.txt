@@ -1,4 +1,4 @@
-git+https://github.com/lamm-mit/GraphReasoning
+-e ./libs/GraphReasoning
 llama_cpp_python==0.3.7
 langchain-community==0.3.17
 llama-index-embeddings-huggingface==0.5.1

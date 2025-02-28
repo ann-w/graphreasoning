@@ -3,6 +3,7 @@ import logging
 import time
 from openai import AzureOpenAI
 from ratelimit import limits, sleep_and_retry
+from create_embeddings_from_knowledge_graph import EmbeddingGenerator
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -54,3 +55,26 @@ class AzureOpenAIClient:
         return self.generate_response(messages)
 
 
+def initialize_clients():
+    """Initialize Azure OpenAI client and embedding generator."""
+    azure_openai_client = AzureOpenAIClient()
+    embedding_generator = EmbeddingGenerator()
+    return azure_openai_client, embedding_generator
+
+
+def create_generate_function_wrapper(client, temperature_value):
+    """Create a generate function for OpenAI API calls.
+    
+    Args:
+        client: The Azure OpenAI client
+        temperature_value: Temperature value for generation
+        
+    Returns:
+        A function that can be passed to LLM
+    """
+    def generate_func(system_prompt, prompt, max_tokens=4096, temperature=None):
+        temp = temperature if temperature is not None else temperature_value
+        full_prompt = f"{system_prompt}\n{prompt}"
+        response = client.generate_completion(prompt=full_prompt, temperature=temp)
+        return response
+    return generate_func

@@ -2,44 +2,9 @@ import os
 import argparse
 import networkx as nx
 from datetime import datetime
-from azure_openai_client import AzureOpenAIClient
-from create_embeddings_from_knowledge_graph import EmbeddingGenerator
+from azure_openai_client import initialize_clients, create_generate_function_wrapper
 from GraphReasoning import load_embeddings, find_path_and_reason
 from utils import save_response_to_csv
-
-def initialize_clients():
-    """Initialize Azure OpenAI client and embedding generator."""
-    azure_openai_client = AzureOpenAIClient()
-    embedding_generator = EmbeddingGenerator()
-    return azure_openai_client, embedding_generator
-
-
-def generate_response(azure_openai_client, system_prompt, prompt, temperature):
-    """Generate response using Azure OpenAI."""
-    full_prompt = f"{system_prompt}\n{prompt}"
-    response = azure_openai_client.generate_completion(prompt=full_prompt, temperature=temperature)
-    return response
-
-
-def create_generate_function(client, temperature_value):
-    """Create a generate function for OpenAI API calls.
-    
-    Args:
-        client: The Azure OpenAI client
-        temperature_value: Temperature value for generation
-        
-    Returns:
-        A function that can be passed to find_path_and_reason
-    """
-    def generate_func(system_prompt, prompt, max_tokens=4096, temperature=None):
-        temp = temperature if temperature is not None else temperature_value
-        return generate_response(
-            azure_openai_client=client,
-            system_prompt=system_prompt, 
-            prompt=prompt, 
-            temperature=temp
-        )
-    return generate_func
 
 
 def query_graph_with_openai(
@@ -65,7 +30,7 @@ def query_graph_with_openai(
 
     azure_openai_client, embedding_generator = initialize_clients()
 
-    generate_func = create_generate_function(azure_openai_client, temperature)
+    generate_func = create_generate_function_wrapper(azure_openai_client, temperature)
 
 
     response, (best_node_1, _, best_node_2, _), path, path_graph, shortest_path_length, fname, graph_GraphML = find_path_and_reason(

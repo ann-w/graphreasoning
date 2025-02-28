@@ -86,13 +86,7 @@ We will use Azure OpenAI to create this graph.
 
 ## Step 3: Reason over the knowledge graph
 
-GraphReasoning allows you to discover connections between concepts and generate insights using a large language model (LLM).
-
-It requires: 
-- Two keywords (e.g., "cement" and "environment") that represent the concepts you want to connect
-- A knowledge graph (G) containing nodes and relationships
-- Node embeddings that represent the semantic meaning of each node
-- An LLM generate function for reasoning over the paths
+The main reasoning functionality in GraphReasoning is centered around the `find_path_and_reason` function in `graph_analysis.py`, which requires explicit specification of two keywords to find connections between them in the knowledge graph.
 
 It works as follows:
 

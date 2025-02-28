@@ -80,13 +80,14 @@ def generate_node_embeddings(
 
 
 def create_embeddings_from_knowledge_graph(
-    data_dir: str = "knowledge_graph_paper_examples",
+    data_dir: str = "data/output/graphs",
     graph_file_name: str = "knowledge_graph_graphML.graphml",
     checkpoint_interval: int = 100,
 ):
     # Prepare directories
-    output_dir = f"{data_dir}/embeddings"
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = f"data/output"
+    embeddings_output_dir = f"{output_dir}/embeddings"
+    os.makedirs(embeddings_output_dir, exist_ok=True)
 
     # Load the graph
     graph_path = f"{data_dir}/{graph_file_name}"
@@ -106,7 +107,7 @@ def create_embeddings_from_knowledge_graph(
     )
 
     # Save final embeddings
-    embeddings_path = f"{output_dir}/node_embeddings.pkl"
+    embeddings_path = f"{embeddings_output_dir}/node_embeddings.pkl"
     save_embeddings(node_embeddings, embeddings_path)
 
     print(f"Embeddings saved to {embeddings_path}")
@@ -114,5 +115,5 @@ def create_embeddings_from_knowledge_graph(
 
 if __name__ == "__main__":
     create_embeddings_from_knowledge_graph(
-        data_dir="knowledge_graph_paper_examples", checkpoint_interval=100
+        data_dir="data/output/graphs", checkpoint_interval=100
     )

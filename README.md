@@ -84,7 +84,7 @@ We will use Azure OpenAI to create this graph.
     python create_embeddings_from_knowledge_graph.py
     ```
 
-## Step 3: Reason over the knowledge graph
+## Step 3: Reason over the knowledge graph with keywords
 
 The main reasoning functionality in GraphReasoning is centered around the `find_path_and_reason` function in `graph_analysis.py`, which requires explicit specification of two keywords to find connections between them in the knowledge graph.
 
@@ -101,5 +101,13 @@ Example usage:
 To reason with the keywords 'cement' and 'environment', run:
 
 ```bash
-python reason_with_knowledge_graph.py --keyword1 "cement" --keyword2 "environment"
+python reason_with_knowledge_graph_using_keywords.py --keyword1 "cement" --keyword2 "environment"
+```
+
+## Step 4: Query the knowledge graph using an LLM
+
+You can also ask a question to the LLM and it wil find the shortest paths in the knowledge graph and add it as context to the LLM
+
+```bash
+python query_using_knowledge_graph.py --query "how does cement impact the environment?"
 ```

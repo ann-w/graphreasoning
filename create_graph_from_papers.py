@@ -56,7 +56,7 @@ def combine_documents_text(documents: List[Any]) -> str:
 def generate_graph_from_papers(
     directory: str,
     generate: Callable[[str, str], str],
-    output_dir: str = "./knowledge_graph_paper_examples/",
+    output_dir: str = "./data/output/graphs",
     num_docs: Optional[int] = None,
 ) -> nx.Graph:
     """
@@ -119,8 +119,8 @@ def main():
     )
     args = parser.parse_args()
 
-    directory = "./paper_examples/"
-    output_dir = "./knowledge_graph_paper_examples/"
+    directory = "./data/input/"
+    output_dir = "./data/output/graphs"
 
     azure_openai_client = AzureOpenAIClient()
 

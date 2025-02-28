@@ -69,7 +69,7 @@ We will use Azure OpenAI to create this graph.
 
 ## Step 2: Embed the nodes of the knowledge graph
 
-1. ill in the following values in the `.env` file.
+1. Fill in the following values in the `.env` file.
 
     ```
     AZURE_OPENAI_EMBEDDING_API_KEY="<your-azure-openai-embedding-api-key>"

@@ -4,9 +4,8 @@ import logging
 import networkx as nx
 from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 
-from libs.GraphReasoning.graph_generation import (
+from GraphReasoning.graph_generation import (
     make_graph_from_text,
-
 )
 from azure_openai_client import AzureOpenAIClient
 
@@ -93,7 +92,7 @@ def generate_graph_from_papers(
     html, graphml, graph, net, pdf = make_graph_from_text(
         all_text,
         generate,
-        include_contextual_proximity=True,  
+        include_contextual_proximity=True,
         graph_root="knowledge_graph",
         chunk_size=2500,
         chunk_overlap=0,

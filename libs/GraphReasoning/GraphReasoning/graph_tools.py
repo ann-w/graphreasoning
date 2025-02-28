@@ -168,6 +168,33 @@ def find_best_fitting_node(keyword, embeddings, tokenizer, model):
     return best_node, best_similarity
 
 
+def find_best_fitting_node_list_with_embedding(embedding, node_embeddings, top_k=5):
+    similarities = []
+    
+    # Convert embedding to numpy array if it's a list
+    if isinstance(embedding, list):
+        embedding = np.array(embedding)
+    
+    # Reshape embedding to 2D array if it's 1D
+    if len(embedding.shape) == 1:
+        embedding = embedding.reshape(1, -1)
+        
+    for node, node_embedding in node_embeddings.items():
+        # Convert node_embedding to numpy array if it's a list
+        if isinstance(node_embedding, list):
+            node_embedding = np.array(node_embedding)
+            
+        # Reshape node_embedding to 2D array if it's 1D
+        if len(node_embedding.shape) == 1:
+            node_embedding = node_embedding.reshape(1, -1)
+            
+        similarity = cosine_similarity(embedding, node_embedding)[0][0]
+        similarities.append((node, similarity))
+    
+    similarities.sort(key=lambda x: x[1], reverse=True)
+    return similarities[:top_k]
+
+
 def find_best_fitting_node_list(keyword, embeddings, tokenizer, model, N_samples=5):
     inputs = tokenizer(keyword, return_tensors="pt")
     outputs = model(**inputs)

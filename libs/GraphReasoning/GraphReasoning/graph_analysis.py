@@ -390,6 +390,8 @@ def find_path(
     model,
     keyword_1="music and sound",
     keyword_2="graphene",
+    keyword_1_embedding=None,
+    keyword_2_embedding=None,
     verbatim=True,
     second_hop=False,
     data_dir="./",
@@ -397,38 +399,48 @@ def find_path(
     similarity_fit_ID_node_2=0,
     save_files=True,
 ):
-    best_node_1, best_similarity_1 = find_best_fitting_node_list(
-        keyword_1,
-        node_embeddings,
-        tokenizer,
-        model,
-        max(5, similarity_fit_ID_node_1 + 1),
-    )[similarity_fit_ID_node_1]
+    # If we have pre-computed embeddings for keywords, use them
+    if keyword_1_embedding is not None:
+        best_node_1, best_similarity_1 = find_best_fitting_node_list_with_embedding(
+            keyword_1_embedding, 
+            node_embeddings, 
+            max(5, similarity_fit_ID_node_1 + 1)
+        )[similarity_fit_ID_node_1]
+    # Otherwise, use the tokenizer and model to generate embeddings
+    elif tokenizer is not None and model is not None:
+        best_node_1, best_similarity_1 = find_best_fitting_node_list(
+            keyword_1, 
+            node_embeddings, 
+            tokenizer, 
+            model, 
+            max(5, similarity_fit_ID_node_1 + 1)
+        )[similarity_fit_ID_node_1]
+    else:
+        raise ValueError("Either pre-computed embeddings or tokenizer+model must be provided")
 
+    # Same for keyword_2
+    if keyword_2_embedding is not None:
+        best_node_2, best_similarity_2 = find_best_fitting_node_list_with_embedding(
+            keyword_2_embedding, 
+            node_embeddings, 
+            max(5, similarity_fit_ID_node_2 + 1)
+        )[similarity_fit_ID_node_2]
+    elif tokenizer is not None and model is not None:
+        best_node_2, best_similarity_2 = find_best_fitting_node_list(
+            keyword_2, 
+            node_embeddings, 
+            tokenizer, 
+            model, 
+            max(5, similarity_fit_ID_node_2 + 1)
+        )[similarity_fit_ID_node_2]
+    else:
+        raise ValueError("Either pre-computed embeddings or tokenizer+model must be provided")
+    
     if verbatim:
-        print(
-            f"{similarity_fit_ID_node_1}nth best fitting node for '{keyword_1}': '{best_node_1}' with similarity: {best_similarity_1}"
-        )
+        print(f"{similarity_fit_ID_node_1}nth best fitting node for '{keyword_1}': '{best_node_1}' with similarity: {best_similarity_1}")
+        print(f"{similarity_fit_ID_node_2}nth best fitting node for '{keyword_2}': '{best_node_2}' with similarity: {best_similarity_2}")
 
-    best_node_2, best_similarity_2 = find_best_fitting_node_list(
-        keyword_2,
-        node_embeddings,
-        tokenizer,
-        model,
-        max(5, similarity_fit_ID_node_2 + 1),
-    )[similarity_fit_ID_node_2]
-    if verbatim:
-        print(
-            f"{similarity_fit_ID_node_2}nth best fitting node for '{keyword_2}': '{best_node_2}' with similarity: {best_similarity_2}"
-        )
-
-    (
-        path,
-        path_graph,
-        shortest_path_length,
-        fname,
-        graph_GraphML,
-    ) = find_shortest_path_with2hops(
+    path, path_graph, shortest_path_length, fname, graph_GraphML = find_shortest_path_with2hops(
         G,
         source=best_node_1,
         target=best_node_2,
@@ -811,9 +823,9 @@ def print_path_with_edges_as_list(G, path, keywords_separator=" --> "):
 def find_path_and_reason(
     G,
     node_embeddings,
-    tokenizer,
-    model,
     generate,
+    tokenizer=None,
+    model=None,
     keyword_1="music and sound",
     # local_llm=None,
     keyword_2="apples",
@@ -835,33 +847,40 @@ def find_path_and_reason(
     visualize_paths_as_graph=True,
     display_graph=True,
     words_per_line=2,
+    embedding_generator=None,
 ):
+    # Generate embeddings for keywords if embedding_generator is provided
+    keyword_1_embedding = None
+    keyword_2_embedding = None
+    if embedding_generator:
+        try:
+            keyword_1_embedding = embedding_generator.generate_embedding(keyword_1)
+            keyword_2_embedding = embedding_generator.generate_embedding(keyword_2)
+        except Exception as e:
+            print(f"Error generating embeddings: {e}")
+    
     make_dir_if_needed(data_dir)
     task = prepend + ""
 
     join_strings = lambda strings: "\n".join(strings)
     join_strings_newline = lambda strings: "\n".join(strings)
 
-    (
-        (best_node_1, best_similarity_1, best_node_2, best_similarity_2),
-        path,
-        path_graph,
-        shortest_path_length,
-        fname,
-        graph_GraphML,
-    ) = find_path(
-        G,
-        node_embeddings,
-        tokenizer,
-        model,
-        keyword_1=keyword_1,
-        keyword_2=keyword_2,
+    (best_node_1, best_similarity_1, best_node_2, best_similarity_2), path, path_graph, shortest_path_length, fname, graph_GraphML = find_path(
+        G, 
+        node_embeddings, 
+        tokenizer, 
+        model, 
+        keyword_1=keyword_1, 
+        keyword_2=keyword_2, 
+        keyword_1_embedding=keyword_1_embedding, 
+        keyword_2_embedding=keyword_2_embedding, 
         verbatim=verbatim,
-        similarity_fit_ID_node_1=similarity_fit_ID_node_1,
-        similarity_fit_ID_node_2=similarity_fit_ID_node_2,
-        data_dir=data_dir,
-        save_files=save_files,
+        similarity_fit_ID_node_1=similarity_fit_ID_node_1, 
+        similarity_fit_ID_node_2=similarity_fit_ID_node_2, 
+        data_dir=data_dir, 
+        save_files=save_files
     )
+
     if visualize_paths_as_graph:
         path_list_for_vis, _ = path_list = print_path_with_edges_as_list(
             G, path, keywords_separator=keywords_separator

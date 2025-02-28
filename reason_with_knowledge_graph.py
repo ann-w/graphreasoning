@@ -1,11 +1,10 @@
 import os
-import csv
 import networkx as nx
 from datetime import datetime
 from azure_openai_client import AzureOpenAIClient
 from create_embeddings_from_knowledge_graph import EmbeddingGenerator
 from GraphReasoning import load_embeddings, find_path_and_reason
-
+from utils import save_response_to_csv
 
 def initialize_clients():
     """Initialize Azure OpenAI client and embedding generator."""
@@ -21,13 +20,25 @@ def generate_response(azure_openai_client, system_prompt, prompt, temperature):
     return response
 
 
-def save_response_to_csv(csv_path, question_text, response):
-    """Save the question and response to a CSV file."""
-    with open(csv_path, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if f.tell() == 0:
-            writer.writerow(["question", "answer"])
-        writer.writerow([question_text, response])
+def create_generate_function(client, temperature_value):
+    """Create a generate function for OpenAI API calls.
+    
+    Args:
+        client: The Azure OpenAI client
+        temperature_value: Temperature value for generation
+        
+    Returns:
+        A function that can be passed to find_path_and_reason
+    """
+    def generate_func(system_prompt, prompt, max_tokens=4096, temperature=None):
+        temp = temperature if temperature is not None else temperature_value
+        return generate_response(
+            azure_openai_client=client,
+            system_prompt=system_prompt, 
+            prompt=prompt, 
+            temperature=temp
+        )
+    return generate_func
 
 
 def query_graph_with_openai(
@@ -40,6 +51,7 @@ def query_graph_with_openai(
     save_output_csv=True,
 ):
     """Query the graph and generate a response using Azure OpenAI."""
+    
     if save_output_csv:
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         os.makedirs(output_dir, exist_ok=True)
@@ -52,13 +64,16 @@ def query_graph_with_openai(
 
     azure_openai_client, embedding_generator = initialize_clients()
 
+    generate_func = create_generate_function(azure_openai_client, temperature)
+
+
     response, (best_node_1, _, best_node_2, _), path, path_graph, shortest_path_length, fname, graph_GraphML = find_path_and_reason(
         G=G,
         node_embeddings=node_embeddings,
-        generate=lambda system_prompt, prompt: generate_response(azure_openai_client, system_prompt, prompt, temperature),
+        generate=generate_func,
         keyword_1=keyword_1,
         keyword_2=keyword_2,
-        output_dir=output_dir,
+        data_dir=output_dir,
         instruction=f"Develop a new research idea around {keyword_1} and {keyword_2}.",
         include_keywords_as_nodes=True,
         visualize_paths_as_graph=True,

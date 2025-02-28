@@ -1,5 +1,5 @@
 import os
-import time
+import numpy as np
 import logging
 import networkx as nx
 from typing import List
@@ -34,17 +34,15 @@ class EmbeddingGenerator:
         for attempt in range(self.max_retries):
             try:
                 response = self.client.embeddings.create(
-                    input=[text], model=os.getenv("AZURE_OPENAI_EMBEDDING_MODEL_NAME")
+                    input=text,
+                    model=os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME", "text-embedding-3-small")
                 )
-                return response.data[0].embedding
+                # Extract the embedding and ensure it's a numpy array with proper shape
+                embedding = np.array(response.data[0].embedding)
+                return embedding  # Return as 1D array, will be reshaped in find_best_fitting_node_list_with_embedding
             except Exception as e:
-                wait_time = self.backoff_factor * (2**attempt)
-                logger.warning(
-                    f"Retry {attempt + 1}/{self.max_retries} after {wait_time}s: {str(e)}"
-                )
-                time.sleep(wait_time)
-                if attempt == self.max_retries - 1:
-                    raise
+                logging.error(f"Error generating embedding: {str(e)}")
+                raise
 
 
 def generate_node_embeddings(

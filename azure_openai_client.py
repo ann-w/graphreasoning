@@ -52,3 +52,5 @@ class AzureOpenAIClient:
         """Generate a completion for a given prompt."""
         messages = [{"role": "user", "content": prompt}]
         return self.generate_response(messages)
+
+

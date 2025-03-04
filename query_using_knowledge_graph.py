@@ -19,7 +19,6 @@ def get_relevant_nodes(query_embedding, node_embeddings, top_k=5):
     Returns:
         List of most relevant node names and their similarities
     """
-    # Use find_best_fitting_node_list_with_embedding instead of calculate_cosine_similarities
     node_similarities = find_best_fitting_node_list_with_embedding(
         query_embedding, node_embeddings, top_k=top_k
     )
@@ -322,15 +321,15 @@ def parse_arguments():
     parser.add_argument(
         "--top-k", 
         type=int, 
-        default=5,
-        help="Number of most relevant nodes to consider (default: 5)"
+        default=3,
+        help="Number of most relevant nodes to consider."
     )
     
     parser.add_argument(
         "--max-path-depth", 
         type=int, 
-        default=2,
-        help="Maximum path length between nodes (default: 2)"
+        default=5,
+        help="Maximum path length between nodes. Controls the maximum length of paths that will be included between relevant nodes in the KG"
     )
     
     return parser.parse_args()

@@ -106,8 +106,8 @@ python reason_with_knowledge_graph_using_keywords.py --keyword1 "cement" --keywo
 
 ## Step 4: Query the knowledge graph using an LLM
 
-You can also ask a question to the LLM and it wil find the shortest paths in the knowledge graph and add it as context to the LLM
+You can also ask a question to the LLM and it wil find the shortest paths in the knowledge graph and add it as context to the LLM. In below example, it will find the 3 most relevant nodes in the graph based on semantic similarity and it find all possible paths between pairs of these relevant nodes and adds these as context to the LLM.
 
 ```bash
-python query_using_knowledge_graph.py --query "how does cement impact the environment?"
+python query_using_knowledge_graph.py --query "how does cement impact the environment? --top-k 3"
 ```

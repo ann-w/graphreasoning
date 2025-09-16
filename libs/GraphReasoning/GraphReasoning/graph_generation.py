@@ -154,7 +154,11 @@ def df2Graph_parallel(
         }
         count = 0
         # wrap as_completed with tqdm to show progress of triplet generation
-        for future in tqdm(as_completed(future_to_index), total=len(future_to_index), desc="Generating triplets"):
+        for future in tqdm(
+            as_completed(future_to_index),
+            total=len(future_to_index),
+            desc="Generating triplets",
+        ):
             idx = future_to_index[future]
             try:
                 res = future.result()

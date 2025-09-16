@@ -9,6 +9,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from GraphReasoning import save_embeddings
 from tqdm import tqdm
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env (so scripts work when run from any CWD)
+load_dotenv()
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -35,7 +39,10 @@ class EmbeddingGenerator:
             try:
                 response = self.client.embeddings.create(
                     input=text,
-                    model=os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME", "text-embedding-3-small")
+                    model=os.getenv(
+                        "AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME",
+                        "text-embedding-3-small",
+                    ),
                 )
                 # Extract the embedding and ensure it's a numpy array with proper shape
                 embedding = np.array(response.data[0].embedding)
@@ -84,13 +91,21 @@ def create_embeddings_from_knowledge_graph(
     graph_file_name: str = "knowledge_graph_graphML.graphml",
     checkpoint_interval: int = 100,
 ):
-    # Prepare directories
-    output_dir = f"data/output"
-    embeddings_output_dir = f"{output_dir}/embeddings"
+    # Prepare directories and make paths absolute (relative to this script file)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir_abs = os.path.join(base_dir, data_dir)
+
+    # output_dir is the parent 'data/output' directory
+    output_dir = os.path.join(base_dir, "data", "output")
+    embeddings_output_dir = os.path.join(output_dir, "embeddings")
     os.makedirs(embeddings_output_dir, exist_ok=True)
 
-    # Load the graph
-    graph_path = f"{data_dir}/{graph_file_name}"
+    # Load the graph from the data_dir (resolved relative to script file)
+    graph_path = os.path.join(data_dir_abs, graph_file_name)
+    if not os.path.exists(graph_path):
+        raise FileNotFoundError(
+            f"Graph file not found: {graph_path} (cwd={os.getcwd()})"
+        )
     G = nx.read_graphml(graph_path)
     logging.info(f"Graph loaded from {graph_path}")
 
